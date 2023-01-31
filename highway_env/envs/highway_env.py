@@ -92,7 +92,7 @@ class HighwayEnv(AbstractEnv):
         if self.config["normalize_reward"]:
             reward = utils.lmap(reward,
                                 [self.config["collision_reward"],
-                                 self.config["high_speed_reward"] + self.config["right_lane_reward"]+self.config["lane_change_reward"]],
+                                 self.config["high_speed_reward"] + self.config["right_lane_reward"], self.config["lane_change_reward"]],
                                 [0, 1])
         reward *= rewards['on_road_reward']
         return reward
@@ -101,6 +101,10 @@ class HighwayEnv(AbstractEnv):
         neighbours = self.road.network.all_side_lanes(self.vehicle.lane_index)
         lane = self.vehicle.target_lane_index[2] if isinstance(self.vehicle, ControlledVehicle) \
             else self.vehicle.lane_index[2]
+        #SJ
+        #if self.vehicle.target_lane_index[2]
+        #lane_c = self.vehicle.target_lane_index[2] if isinstance(self.vehicle, ControlledVehicle) \
+        #    else self.vehicle.lane_index[2]
         # Use forward speed rather than speed, see https://github.com/eleurent/highway-env/issues/268
         forward_speed = self.vehicle.speed * np.cos(self.vehicle.heading)
         scaled_speed = utils.lmap(forward_speed, self.config["reward_speed_range"], [0, 1])
