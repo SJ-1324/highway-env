@@ -16,7 +16,6 @@ Observation = np.ndarray
 class HighwayEnv(AbstractEnv):
     """
     A highway driving environment.
-
     The vehicle is driving on a straight highway with several lanes, and is rewarded for reaching a high speed,
     staying on the rightmost lanes and avoiding collisions.
     """
@@ -43,7 +42,7 @@ class HighwayEnv(AbstractEnv):
                                        # zero for other lanes.
             "high_speed_reward": 0.4,  # The reward received when driving at full speed, linearly mapped to zero for
                                        # lower speeds according to config["reward_speed_range"].
-            "lane_change_reward": -0.1,   # The reward received at each lane change action.
+            "lane_change_reward": 0,   # The reward received at each lane change action.
             "reward_speed_range": [20, 30],
             "normalize_reward": True,
             "offroad_terminal": False
@@ -91,8 +90,8 @@ class HighwayEnv(AbstractEnv):
         reward = sum(self.config.get(name, 0) * reward for name, reward in rewards.items())
         if self.config["normalize_reward"]:
             reward = utils.lmap(reward,
-                                [self.config["collision_reward"]+self.config["high_speed_reward"],
-                                 self.config["right_lane_reward"]+self.config["lane_change_reward"]],
+                                [self.config["collision_reward"],
+                                 self.config["high_speed_reward"] + self.config["right_lane_reward"]],
                                 [0, 1])
         reward *= rewards['on_road_reward']
         return reward
@@ -108,7 +107,6 @@ class HighwayEnv(AbstractEnv):
             "collision_reward": float(self.vehicle.crashed),
             "right_lane_reward": lane / max(len(neighbours) - 1, 1),
             "high_speed_reward": np.clip(scaled_speed, 0, 1),
-            "lane_change_reward": action in [0, 2]
             "on_road_reward": float(self.vehicle.on_road)
         }
 
